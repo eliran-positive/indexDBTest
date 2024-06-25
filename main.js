@@ -1,8 +1,4 @@
 // Initialize Dexie.js
-Dexie.setDefaultTransactionOptions({
-  durability: 'strict'
-});
-
 const db = new Dexie("testDB");
 db.version(1).stores({
     temp1: "++id,syncStatus",
@@ -49,8 +45,8 @@ async function addRecordsDexieWaitFor() {
 async function addRecords() {
     console.log('Button addRecords clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async (tx) => {
-            tx.durability = 'strict';
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async (tx) => {
+            // tx.durability = 'strict';
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
