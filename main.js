@@ -20,27 +20,12 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecords() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, async (trans) => {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
             // Perform dummy operations to keep the transaction alive
-            const delayPromise = new Promise((resolve) => {
-                const end = Date.now() + 10000;
-                const keepAlive = async () => {
-                    if (Date.now() < end) {
-                        // Perform a dummy operation to keep the transaction alive
-                        await db.temp1.add({ syncStatus: 0 }).catch(() => {});
-                        await db.temp1.delete(0).catch(() => {});
-                        setTimeout(keepAlive, 100);
-                    } else {
-                        resolve();
-                    }
-                };
-                keepAlive();
-            });
-
-            await delayPromise;
+            await delayWithDummyOperations(trans, 10000);
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
@@ -56,27 +41,12 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, async (trans) => {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
             // Perform dummy operations to keep the transaction alive
-            const delayPromise = new Promise((resolve) => {
-                const end = Date.now() + 10000;
-                const keepAlive = async () => {
-                    if (Date.now() < end) {
-                        // Perform a dummy operation to keep the transaction alive
-                        await db.temp1.add({ syncStatus: 0 }).catch(() => {});
-                        await db.temp1.delete(0).catch(() => {});
-                        setTimeout(keepAlive, 100);
-                    } else {
-                        resolve();
-                    }
-                };
-                keepAlive();
-            });
-
-            await delayPromise;
+            await delayWithDummyOperations(trans, 10000);
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
@@ -101,5 +71,15 @@ async function clearTables() {
         console.log('Tables cleared');
     } catch (error) {
         console.error('Error clearing tables:', error);
+    }
+}
+
+// Helper function to create a delay with dummy operations to keep the transaction alive
+async function delayWithDummyOperations(trans, ms) {
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+        // Perform a dummy operation to keep the transaction alive
+        await db.temp1.add({ syncStatus: 0 }).catch(() => {}); // Catch and ignore the error
+        await db.temp1.delete(0).catch(() => {}); // Catch and ignore the error
     }
 }
