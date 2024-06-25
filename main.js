@@ -24,12 +24,28 @@ async function addRecords() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            // Delay of 10 seconds before adding to temp2
-            await sleep(10000);
+            // Perform dummy operations to keep the transaction alive
+            const delayPromise = new Promise((resolve) => {
+                const end = Date.now() + 10000;
+                const keepAlive = async () => {
+                    if (Date.now() < end) {
+                        // Perform a dummy operation to keep the transaction alive
+                        await db.temp1.add({ syncStatus: 0 }).catch(() => {});
+                        await db.temp1.delete(0).catch(() => {});
+                        setTimeout(keepAlive, 100);
+                    } else {
+                        resolve();
+                    }
+                };
+                keepAlive();
+            });
+
+            await delayPromise;
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
         });
+
         console.log('Transaction completed');
     } catch (error) {
         console.error('Transaction error:', error);
@@ -44,8 +60,23 @@ async function addRecordsWithException() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            // Delay of 10 seconds before adding to temp2 and then throw an exception
-            await sleep(10000);
+            // Perform dummy operations to keep the transaction alive
+            const delayPromise = new Promise((resolve) => {
+                const end = Date.now() + 10000;
+                const keepAlive = async () => {
+                    if (Date.now() < end) {
+                        // Perform a dummy operation to keep the transaction alive
+                        await db.temp1.add({ syncStatus: 0 }).catch(() => {});
+                        await db.temp1.delete(0).catch(() => {});
+                        setTimeout(keepAlive, 100);
+                    } else {
+                        resolve();
+                    }
+                };
+                keepAlive();
+            });
+
+            await delayPromise;
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
@@ -71,9 +102,4 @@ async function clearTables() {
     } catch (error) {
         console.error('Error clearing tables:', error);
     }
-}
-
-// Helper function to create a delay
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
