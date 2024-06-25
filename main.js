@@ -13,11 +13,12 @@ db.on('ready', async () => {
 });
 
 document.getElementById('addRecordsButton').addEventListener('click', addRecords);
+document.getElementById('addRecordsDexieWaitForButton').addEventListener('click', addRecordsDexieWaitFor);
 document.getElementById('addRecordsWithExceptionButton').addEventListener('click', addRecordsWithException);
 document.getElementById('clearTablesButton').addEventListener('click', clearTables);
 
 // Function to add records to both tables
-async function addRecords() {
+async function addRecordsDexieWaitFor() {
     console.log('Button clicked');
     try {
         await db.transaction('rw', db.temp1, db.temp2, async () => {
@@ -27,6 +28,30 @@ async function addRecords() {
 
             // Wait for 10 seconds
             await Dexie.waitFor(sleep(10000));
+            console.log('10 seconds passed');
+
+            // Add to temp2
+            await db.temp2.put({ syncStatus: 1 });
+            console.log('Record added to temp2');
+        });
+
+        console.log('Transaction completed successfully');
+    } catch (error) {
+        console.error('Transaction error:', error);
+    }
+}
+
+// Function to add records to both tables
+async function addRecords() {
+    console.log('Button addRecords clicked');
+    try {
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            // Add to temp1
+            await db.temp1.put({ syncStatus: 1 });
+            console.log('Record added to temp1');
+
+            // Wait for 10 seconds
+            await sleep(10000);
             console.log('10 seconds passed');
 
             // Add to temp2
