@@ -1,5 +1,5 @@
 // Initialize Dexie.js
-const db = new Dexie("testDB", { durability: 'strict' });
+const db = new Dexie("testDB");
 db.version(1).stores({
     temp1: "++id,syncStatus",
     temp2: "++id,syncStatus"
@@ -17,11 +17,11 @@ document.getElementById('addRecordsDexieWaitForButton').addEventListener('click'
 document.getElementById('addRecordsWithExceptionButton').addEventListener('click', addRecordsWithException);
 document.getElementById('clearTablesButton').addEventListener('click', clearTables);
 
-// Function to add records to both tables
+// Function to add records to both tables using Dexie's waitFor method
 async function addRecordsDexieWaitFor() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async () => {
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -45,8 +45,7 @@ async function addRecordsDexieWaitFor() {
 async function addRecords() {
     console.log('Button addRecords clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async (tx) => {
-            // tx.durability = 'strict';
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async () => {
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -70,7 +69,7 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async () => {
             // Add to temp1
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -98,7 +97,7 @@ async function addRecordsWithException() {
 async function clearTables() {
     console.log('Clear Tables button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async () => {
             await db.temp1.clear();
             console.log('temp1 cleared');
             await db.temp2.clear();
