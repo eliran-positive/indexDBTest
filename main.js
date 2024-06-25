@@ -20,19 +20,24 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecords() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        // First transaction
+        await db.transaction('rw', db.temp1, async () => {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
+        });
 
-            await Dexie.ignoreTransaction(() => sleep(10000));
+        console.log('Waiting for 10 seconds...');
+        await sleep(10000);
 
+        // Second transaction
+        await db.transaction('rw', db.temp2, async () => {
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
         });
 
-        console.log('Transaction completed');
+        console.log('All operations completed');
     } catch (error) {
-        console.error('Transaction error:', error);
+        console.error('Operation error:', error);
     }
 }
 
@@ -40,19 +45,25 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        // First transaction
+        await db.transaction('rw', db.temp1, async () => {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
+        });
 
-            await Dexie.ignoreTransaction(() => sleep(10000));
+        console.log('Waiting for 10 seconds...');
+        await sleep(10000);
 
+        // Second transaction
+        await db.transaction('rw', db.temp2, async () => {
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
-            console.log('Throwing an exception after delay');
-            throw new Error('Intentional error after delay');
         });
+
+        console.log('Throwing an exception after delay');
+        throw new Error('Intentional error after delay');
     } catch (error) {
-        console.error('Transaction error:', error);
+        console.error('Operation error:', error);
     }
 }
 
