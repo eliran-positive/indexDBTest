@@ -20,12 +20,35 @@ request.onsuccess = (event) => {
     db = event.target.result;
     console.log('Database initialized');
 
+    // Clear tables on page load
+    clearTables();
+
     // Start the Web Worker
     const worker = new Worker('worker.js');
     worker.postMessage({ type: 'start', dbName: 'testDB' });
 
     document.getElementById('addRecordsButton').addEventListener('click', addRecords);
 };
+
+// Function to clear the tables
+function clearTables() {
+    const transaction = db.transaction(['temp1', 'temp2'], 'readwrite');
+
+    transaction.onerror = (event) => {
+        console.error('Transaction error while clearing tables:', event.target.errorCode);
+    };
+
+    const temp1 = transaction.objectStore('temp1');
+    const temp2 = transaction.objectStore('temp2');
+
+    temp1.clear().onsuccess = () => {
+        console.log('temp1 cleared');
+    };
+
+    temp2.clear().onsuccess = () => {
+        console.log('temp2 cleared');
+    };
+}
 
 // Function to add records to both tables
 function addRecords() {
