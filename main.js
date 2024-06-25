@@ -1,5 +1,5 @@
 // Initialize Dexie.js
-const db = new Dexie("testDB");
+const db = new Dexie("testDB", { durability: 'strict' });
 db.version(1).stores({
     temp1: "++id,syncStatus",
     temp2: "++id,syncStatus"
@@ -45,7 +45,7 @@ async function addRecordsDexieWaitFor() {
 async function addRecords() {
     console.log('Button addRecords clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async (tx) => {
+        await db.transaction('rw', db.temp1, db.temp2, async (tx) => {
             // tx.durability = 'strict';
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
