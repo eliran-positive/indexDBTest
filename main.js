@@ -22,16 +22,20 @@ async function addRecords() {
     try {
         await db.transaction('rw', db.temp1, db.temp2, async () => {
             // Add to temp1
-            await db.temp1.add({ syncStatus: 1 });
-            console.log('Record added to temp1');
+            let promises = [];
+            
+            promises.push(db.temp1.put({ syncStatus: 1 }));
+            // console.log('Record added to temp1');
 
             // Use Dexie.waitFor for the delay
-            await Dexie.waitFor(sleep(10000));
-            console.log('10 seconds passed');
+            promises.push(sleep(10000));
+            // await Dexie.waitFor(sleep(10000));
+            // console.log('10 seconds passed');
 
             // Add to temp2
-            await db.temp2.add({ syncStatus: 1 });
-            console.log('Record added to temp2');
+            promises.push(db.temp2.put({ syncStatus: 1 }));
+            await Promise.all(promises)
+            // console.log('Record added to temp2');
         });
 
         console.log('Transaction completed successfully');
