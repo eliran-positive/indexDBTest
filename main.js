@@ -24,7 +24,7 @@ async function addRecords() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            await sleep(10000);
+            await Dexie.ignoreTransaction(() => sleep(10000));
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
@@ -44,7 +44,7 @@ async function addRecordsWithException() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            await sleep(10000);
+            await Dexie.ignoreTransaction(() => sleep(10000));
 
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
