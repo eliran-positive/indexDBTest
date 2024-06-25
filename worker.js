@@ -1,27 +1,22 @@
 self.onmessage = function(event) {
     if (event.data.type === 'start') {
         const dbName = event.data.dbName;
+        importScripts('https://unpkg.com/dexie@3.2.4/dist/dexie.js');
 
-        const request = indexedDB.open(dbName, 1);
+        const db = new Dexie(dbName);
+        db.version(1).stores({
+            temp1: "++id,syncStatus"
+        });
 
-        request.onerror = (event) => {
-            console.error('Worker database error:', event.target.errorCode);
-        };
+        console.log('Worker database initialized');
 
-        request.onsuccess = (event) => {
-            const db = event.target.result;
-            console.log('Worker database initialized');
-
-            setInterval(() => {
-                const transaction = db.transaction('temp1', 'readonly');
-                const objectStore = transaction.objectStore('temp1');
-                const index = objectStore.index('syncStatus');
-
-                const request = index.getAll(1);
-                request.onsuccess = (event) => {
-                    console.log('Records with syncStatus=1:', event.target.result);
-                };
-            }, 5000);
-        };
+        setInterval(async () => {
+            try {
+                const records = await db.temp1.where('syncStatus').equals(1).toArray();
+                console.log('Records with syncStatus=1:', records);
+            } catch (error) {
+                console.error('Error fetching records in worker:', error);
+            }
+        }, 5000);
     }
 };
