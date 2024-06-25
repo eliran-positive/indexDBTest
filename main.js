@@ -1,4 +1,8 @@
 // Initialize Dexie.js
+Dexie.setDefaultTransactionOptions({
+  durability: 'strict'
+});
+
 const db = new Dexie("testDB");
 db.version(1).stores({
     temp1: "++id,syncStatus",
