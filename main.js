@@ -20,15 +20,20 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecords() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async (trans) => {
-            await db.temp1.add({ syncStatus: 1 });
-            console.log('Record added to temp1');
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            const promises = [];
 
-            // Perform dummy operations to keep the transaction alive
-            await delayWithDummyOperations(trans, 10000);
+            promises.push(db.temp1.add({ syncStatus: 1 }).then(() => {
+                console.log('Record added to temp1');
+            }));
 
-            await db.temp2.add({ syncStatus: 1 });
-            console.log('Record added to temp2');
+            promises.push(sleep(10000));
+
+            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
+                console.log('Record added to temp2');
+            }));
+
+            await Promise.all(promises);
         });
 
         console.log('Transaction completed');
@@ -41,17 +46,22 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async (trans) => {
-            await db.temp1.add({ syncStatus: 1 });
-            console.log('Record added to temp1');
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            const promises = [];
 
-            // Perform dummy operations to keep the transaction alive
-            await delayWithDummyOperations(trans, 10000);
+            promises.push(db.temp1.add({ syncStatus: 1 }).then(() => {
+                console.log('Record added to temp1');
+            }));
 
-            await db.temp2.add({ syncStatus: 1 });
-            console.log('Record added to temp2');
-            console.log('Throwing an exception after delay');
-            throw new Error('Intentional error after delay');
+            promises.push(sleep(10000));
+
+            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
+                console.log('Record added to temp2');
+                console.log('Throwing an exception after delay');
+                throw new Error('Intentional error after delay');
+            }));
+
+            await Promise.all(promises);
         });
     } catch (error) {
         console.error('Transaction error:', error);
@@ -74,12 +84,7 @@ async function clearTables() {
     }
 }
 
-// Helper function to create a delay with dummy operations to keep the transaction alive
-async function delayWithDummyOperations(trans, ms) {
-    const end = Date.now() + ms;
-    while (Date.now() < end) {
-        // Perform a dummy operation to keep the transaction alive
-        await db.temp1.add({ syncStatus: 0 }).catch(() => {}); // Catch and ignore the error
-        await db.temp1.delete(0).catch(() => {}); // Catch and ignore the error
-    }
+// Helper function to create a delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
