@@ -29,19 +29,29 @@ request.onsuccess = (event) => {
 
 // Function to add records to both tables
 function addRecords() {
+    console.log('Button clicked');
+
     const transaction = db.transaction(['temp1', 'temp2'], 'readwrite');
 
     transaction.onerror = (event) => {
         console.error('Transaction error:', event.target.errorCode);
     };
 
+    transaction.oncomplete = (event) => {
+        console.log('Transaction completed');
+    };
+
     const temp1 = transaction.objectStore('temp1');
     const temp2 = transaction.objectStore('temp2');
 
-    temp1.add({ syncStatus: 1 });
+    temp1.add({ syncStatus: 1 }).onsuccess = () => {
+        console.log('Record added to temp1');
+    };
 
     // Delay of 10 seconds before adding to temp2
     setTimeout(() => {
-        temp2.add({ syncStatus: 1 });
+        temp2.add({ syncStatus: 1 }).onsuccess = () => {
+            console.log('Record added to temp2');
+        };
     }, 10000);
 }
