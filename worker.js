@@ -12,8 +12,10 @@ self.onmessage = function(event) {
 
         setInterval(async () => {
             try {
-                const records = await db.temp1.where('syncStatus').equals(1).toArray();
-                console.log('Records with syncStatus=1:', records);
+                const records1 = await db.temp1.where('syncStatus').equals(1).toArray();
+                console.log('Records with syncStatus=1 on temp1:', records1);
+                const records2 = await db.temp2.where('syncStatus').equals(1).toArray();
+                console.log('Records with syncStatus=1 on temp2:', records2);
             } catch (error) {
                 console.error('Error fetching records in worker:', error);
             }
