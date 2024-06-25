@@ -20,24 +20,27 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecords() {
     console.log('Button clicked');
     try {
-        // First transaction
-        await db.transaction('rw', db.temp1, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            // Add to temp1
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
-        });
 
-        console.log('Waiting for 10 seconds...');
-        await sleep(10000);
+            // Simulate delay without blocking the transaction
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    console.log('10 seconds passed');
+                    resolve();
+                }, 10000);
+            });
 
-        // Second transaction
-        await db.transaction('rw', db.temp2, async () => {
+            // Add to temp2
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
         });
 
-        console.log('All operations completed');
+        console.log('Transaction completed successfully');
     } catch (error) {
-        console.error('Operation error:', error);
+        console.error('Transaction error:', error);
     }
 }
 
@@ -45,25 +48,28 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        // First transaction
-        await db.transaction('rw', db.temp1, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            // Add to temp1
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
-        });
 
-        console.log('Waiting for 10 seconds...');
-        await sleep(10000);
+            // Simulate delay without blocking the transaction
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    console.log('10 seconds passed');
+                    resolve();
+                }, 10000);
+            });
 
-        // Second transaction
-        await db.transaction('rw', db.temp2, async () => {
+            // Add to temp2
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
-        });
 
-        console.log('Throwing an exception after delay');
-        throw new Error('Intentional error after delay');
+            console.log('Throwing an exception after delay');
+            throw new Error('Intentional error after delay');
+        });
     } catch (error) {
-        console.error('Operation error:', error);
+        console.error('Transaction error:', error);
     }
 }
 
@@ -81,9 +87,4 @@ async function clearTables() {
     } catch (error) {
         console.error('Error clearing tables:', error);
     }
-}
-
-// Helper function to create a delay
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
