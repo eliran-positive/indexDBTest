@@ -14,6 +14,7 @@ db.on('ready', async () => {
 
 document.getElementById('addRecordsButton').addEventListener('click', addRecords);
 document.getElementById('addRecordsWithExceptionButton').addEventListener('click', addRecordsWithException);
+document.getElementById('clearTablesButton').addEventListener('click', clearTables);
 
 // Function to add records to both tables
 async function addRecords() {
@@ -53,6 +54,22 @@ async function addRecordsWithException() {
         });
     } catch (error) {
         console.error('Transaction error:', error);
+    }
+}
+
+// Function to clear all data in both tables
+async function clearTables() {
+    console.log('Clear Tables button clicked');
+    try {
+        await db.transaction('rw', db.temp1, db.temp2, async () => {
+            await db.temp1.clear();
+            console.log('temp1 cleared');
+            await db.temp2.clear();
+            console.log('temp2 cleared');
+        });
+        console.log('Tables cleared');
+    } catch (error) {
+        console.error('Error clearing tables:', error);
     }
 }
 
