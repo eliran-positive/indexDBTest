@@ -25,13 +25,9 @@ async function addRecords() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            // Simulate delay without blocking the transaction
-            await new Promise(resolve => {
-                setTimeout(() => {
-                    console.log('10 seconds passed');
-                    resolve();
-                }, 10000);
-            });
+            // Use Dexie.waitFor for the delay
+            await Dexie.waitFor(sleep(10000));
+            console.log('10 seconds passed');
 
             // Add to temp2
             await db.temp2.add({ syncStatus: 1 });
@@ -53,13 +49,9 @@ async function addRecordsWithException() {
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
 
-            // Simulate delay without blocking the transaction
-            await new Promise(resolve => {
-                setTimeout(() => {
-                    console.log('10 seconds passed');
-                    resolve();
-                }, 10000);
-            });
+            // Use Dexie.waitFor for the delay
+            await Dexie.waitFor(sleep(10000));
+            console.log('10 seconds passed');
 
             // Add to temp2
             await db.temp2.add({ syncStatus: 1 });
@@ -87,4 +79,9 @@ async function clearTables() {
     } catch (error) {
         console.error('Error clearing tables:', error);
     }
+}
+
+// Helper function to create a delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
