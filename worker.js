@@ -5,7 +5,8 @@ self.onmessage = function(event) {
 
         const db = new Dexie(dbName);
         db.version(1).stores({
-            temp1: "++id,syncStatus"
+            temp1: "++id,syncStatus",
+            temp2: "++id,syncStatus"
         });
 
         console.log('Worker database initialized');
