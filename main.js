@@ -53,12 +53,12 @@ async function addRecordsWithException() {
             await Dexie.waitFor(sleep(10000));
             console.log('10 seconds passed');
 
+            console.log('Throwing an exception after delay');
+            throw new Error('Intentional error after delay');
+            
             // Add to temp2
             await db.temp2.add({ syncStatus: 1 });
             console.log('Record added to temp2');
-
-            console.log('Throwing an exception after delay');
-            throw new Error('Intentional error after delay');
         });
     } catch (error) {
         console.error('Transaction error:', error);
