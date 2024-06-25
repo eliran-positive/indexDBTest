@@ -53,12 +53,16 @@ async function addRecordsWithException() {
                 console.log('Record added to temp1');
             }));
 
-            promises.push(sleep(10000));
-
-            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
+            promises.push(sleep(10000).then(() => {
                 console.log('Record added to temp2');
                 console.log('Throwing an exception after delay');
                 throw new Error('Intentional error after delay');
+            }));
+
+            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
+                console.log('Record added to temp2');
+                //console.log('Throwing an exception after delay');
+                //throw new Error('Intentional error after delay');
             }));
 
             await Promise.all(promises);
