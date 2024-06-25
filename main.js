@@ -20,35 +20,13 @@ request.onsuccess = (event) => {
     db = event.target.result;
     console.log('Database initialized');
 
-    // Clear tables on page load
-    clearTables();
-
     // Start the Web Worker
     const worker = new Worker('worker.js');
     worker.postMessage({ type: 'start', dbName: 'testDB' });
 
     document.getElementById('addRecordsButton').addEventListener('click', addRecords);
+    document.getElementById('addRecordsWithExceptionButton').addEventListener('click', addRecordsWithException);
 };
-
-// Function to clear the tables
-function clearTables() {
-    const transaction = db.transaction(['temp1', 'temp2'], 'readwrite');
-
-    transaction.onerror = (event) => {
-        console.error('Transaction error while clearing tables:', event.target.errorCode);
-    };
-
-    const temp1 = transaction.objectStore('temp1');
-    const temp2 = transaction.objectStore('temp2');
-
-    temp1.clear().onsuccess = () => {
-        console.log('temp1 cleared');
-    };
-
-    temp2.clear().onsuccess = () => {
-        console.log('temp2 cleared');
-    };
-}
 
 // Function to add records to both tables
 function addRecords() {
@@ -76,5 +54,33 @@ function addRecords() {
         temp2.add({ syncStatus: 1 }).onsuccess = () => {
             console.log('Record added to temp2');
         };
+    }, 10000);
+}
+
+// Function to add records to both tables and throw an exception
+function addRecordsWithException() {
+    console.log('Button clicked');
+
+    const transaction = db.transaction(['temp1', 'temp2'], 'readwrite');
+
+    transaction.onerror = (event) => {
+        console.error('Transaction error:', event.target.errorCode);
+    };
+
+    transaction.oncomplete = (event) => {
+        console.log('Transaction completed');
+    };
+
+    const temp1 = transaction.objectStore('temp1');
+    const temp2 = transaction.objectStore('temp2');
+
+    temp1.add({ syncStatus: 1 }).onsuccess = () => {
+        console.log('Record added to temp1');
+    };
+
+    // Delay of 10 seconds before adding to temp2 and then throw an exception
+    setTimeout(() => {
+        console.log('Throwing an exception after delay');
+        throw new Error('Intentional error after delay');
     }, 10000);
 }
