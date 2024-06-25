@@ -21,19 +21,13 @@ async function addRecords() {
     console.log('Button clicked');
     try {
         await db.transaction('rw', db.temp1, db.temp2, async () => {
-            const promises = [];
+            await db.temp1.add({ syncStatus: 1 });
+            console.log('Record added to temp1');
 
-            promises.push(db.temp1.add({ syncStatus: 1 }).then(() => {
-                console.log('Record added to temp1');
-            }));
+            await sleep(10000);
 
-            promises.push(sleep(10000));
-
-            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
-                console.log('Record added to temp2');
-            }));
-
-            await Promise.all(promises);
+            await db.temp2.add({ syncStatus: 1 });
+            console.log('Record added to temp2');
         });
 
         console.log('Transaction completed');
@@ -47,25 +41,15 @@ async function addRecordsWithException() {
     console.log('Button clicked');
     try {
         await db.transaction('rw', db.temp1, db.temp2, async () => {
-            const promises = [];
+            await db.temp1.add({ syncStatus: 1 });
+            console.log('Record added to temp1');
 
-            promises.push(db.temp1.add({ syncStatus: 1 }).then(() => {
-                console.log('Record added to temp1');
-            }));
+            await sleep(10000);
 
-            promises.push(sleep(10000).then(() => {
-                console.log('Record added to temp2');
-                console.log('Throwing an exception after delay');
-                throw new Error('Intentional error after delay');
-            }));
-
-            promises.push(db.temp2.add({ syncStatus: 1 }).then(() => {
-                console.log('Record added to temp2');
-                //console.log('Throwing an exception after delay');
-                //throw new Error('Intentional error after delay');
-            }));
-
-            await Promise.all(promises);
+            await db.temp2.add({ syncStatus: 1 });
+            console.log('Record added to temp2');
+            console.log('Throwing an exception after delay');
+            throw new Error('Intentional error after delay');
         });
     } catch (error) {
         console.error('Transaction error:', error);
