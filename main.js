@@ -21,7 +21,7 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecordsDexieWaitFor() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', db.temp1, db.temp2, async () => {
+        await db.transaction('rw', db.temp1, db.temp2, { durability: 'strict' }, async () => {
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
