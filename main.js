@@ -21,7 +21,8 @@ document.getElementById('clearTablesButton').addEventListener('click', clearTabl
 async function addRecordsDexieWaitFor() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', ['temp1', 'temp2'], { durability: 'strict' }, async () => {
+        await db.transaction('rw', ['temp1', 'temp2'], async (trans) => {
+            trans.idbtrans.durability = 'strict';
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -45,7 +46,8 @@ async function addRecordsDexieWaitFor() {
 async function addRecords() {
     console.log('Button addRecords clicked');
     try {
-        await db.transaction('rw', { tables: ['temp1', 'temp2'], durability: 'strict' }, async () => {
+        await db.transaction('rw', ['temp1', 'temp2'], async (trans) => {
+            trans.idbtrans.durability = 'strict';
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -69,7 +71,8 @@ async function addRecords() {
 async function addRecordsWithException() {
     console.log('Button clicked');
     try {
-        await db.transaction('rw', { tables: ['temp1', 'temp2'], durability: 'strict' }, async () => {
+        await db.transaction('rw', ['temp1', 'temp2'], async (trans) => {
+            trans.idbtrans.durability = 'strict';
             // Add to temp1
             await db.temp1.add({ syncStatus: 1 });
             console.log('Record added to temp1');
@@ -97,7 +100,8 @@ async function addRecordsWithException() {
 async function clearTables() {
     console.log('Clear Tables button clicked');
     try {
-        await db.transaction('rw', { tables: ['temp1', 'temp2'], durability: 'strict' }, async () => {
+        await db.transaction('rw', ['temp1', 'temp2'], async (trans) => {
+            trans.idbtrans.durability = 'strict';
             await db.temp1.clear();
             console.log('temp1 cleared');
             await db.temp2.clear();
