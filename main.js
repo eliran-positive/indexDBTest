@@ -36,9 +36,10 @@ async function addRecords() {
             promises.push(db.temp2.put({ syncStatus: 1 }));
             await Promise.all(promises)
             // console.log('Record added to temp2');
+            console.log('Transaction completed successfully');
         });
 
-        console.log('Transaction completed successfully');
+        
     } catch (error) {
         console.error('Transaction error:', error);
     }
