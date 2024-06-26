@@ -5,6 +5,8 @@ db.version(1).stores({
     temp2: "++id,syncStatus"
 });
 
+db.chromeTransactionDurability = 'strict';
+
 db.on('ready', async () => {
     console.log('Database initialized');
     // Start the Web Worker
