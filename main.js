@@ -5,6 +5,10 @@ db.version(1).stores({
     temp2: "++id,syncStatus"
 });
 
+// Set the durability to 'strict' for all transactions
+db.useTransactionDurability('strict');
+
+// Or, if you're using Chrome, you can use:
 db.chromeTransactionDurability = 'strict';
 
 db.on('ready', async () => {
