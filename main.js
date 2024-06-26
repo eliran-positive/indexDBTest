@@ -5,9 +5,6 @@ db.version(1).stores({
     temp2: "++id,syncStatus"
 });
 
-// Set the durability to 'strict' for all transactions
-db.useTransactionDurability('strict');
-
 // Or, if you're using Chrome, you can use:
 db.chromeTransactionDurability = 'strict';
 
@@ -53,7 +50,7 @@ async function addRecords() {
     console.log('Button addRecords clicked');
     try {
         await db.transaction('rw', ['temp1', 'temp2'], async (trans) => {
-            trans.idbtrans.durability = 'strict';
+            // trans.idbtrans.durability = 'strict';
             // Add to temp1
             await db.temp1.put({ syncStatus: 1 });
             console.log('Record added to temp1');
